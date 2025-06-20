@@ -107,7 +107,7 @@ const BlockManager = () => {
       affectedVideos: formData.type === 'static' ? 127 : formData.type === 'category' ? 34 : 1,
       lastModified: new Date().toISOString().split('T')[0],
       schedule: formData.schedule.type === 'specific' ? {
-        type: formData.schedule.type,
+        type: 'specific',
         startDate: formData.schedule.startDate,
         endDate: formData.schedule.endDate
       } : { type: 'permanent' }
@@ -133,7 +133,11 @@ const BlockManager = () => {
       category: block.category || '',
       videoId: block.videoId || '',
       order: block.order,
-      schedule: block.schedule || { type: 'permanent' }
+      schedule: {
+        type: block.schedule?.type || 'permanent',
+        startDate: block.schedule?.startDate,
+        endDate: block.schedule?.endDate
+      }
     });
     setIsDialogOpen(true);
   };
@@ -141,13 +145,13 @@ const BlockManager = () => {
   const handleUpdateBlock = () => {
     if (!editingBlock) return;
 
-    const updatedBlock = {
+    const updatedBlock: Block = {
       ...editingBlock,
       title: formData.title,
       content: formData.content,
       order: formData.order,
       schedule: formData.schedule.type === 'specific' ? {
-        type: formData.schedule.type,
+        type: 'specific',
         startDate: formData.schedule.startDate,
         endDate: formData.schedule.endDate
       } : { type: 'permanent' },

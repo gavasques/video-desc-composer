@@ -1,5 +1,6 @@
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
+import { ValidationService } from "@/services/ValidationService"
 
 import { cn } from "@/lib/utils"
 
@@ -74,25 +75,40 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
+  // Sanitize CSS content to prevent XSS
+  const sanitizedCSS = React.useMemo(() => {
+    const cssContent = Object.entries(THEMES)
+      .map(
+        ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+    
+    // Validate color values to prevent CSS injection
+    if (color && /^#[0-9A-Fa-f]{3,6}$|^rgb\(|^rgba\(|^hsl\(|^hsla\(/.test(color)) {
+      // Sanitize the key to prevent CSS injection
+      const sanitizedKey = key.replace(/[^a-zA-Z0-9_-]/g, '');
+      return `  --color-${sanitizedKey}: ${color};`
+    }
+    return null
   })
+  .filter(Boolean)
   .join("\n")}
 }
 `
-          )
-          .join("\n"),
+      )
+      .join("\n");
+
+    return ValidationService.sanitizeHtml(cssContent);
+  }, [id, colorConfig]);
+
+  return (
+    <style
+      dangerouslySetInnerHTML={{
+        __html: sanitizedCSS,
       }}
     />
   )

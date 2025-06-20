@@ -1,16 +1,30 @@
 
-import { useState } from "react";
+import React, { lazy, Suspense } from "react";
 import { ArrowLeft, User, Key, Shield, Settings as SettingsIcon, Zap } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import SettingsErrorBoundary from "./settings/SettingsErrorBoundary";
-import AccountSettings from "./settings/AccountSettings";
-import ApiSettings from "./settings/ApiSettings";
-import AuthSettings from "./settings/AuthSettings";
-import GeneralSettings from "./settings/GeneralSettings";
-import AdvancedSettings from "./settings/AdvancedSettings";
+
+// Lazy load settings components
+const AccountSettings = lazy(() => import("./settings/AccountSettings"));
+const ApiSettings = lazy(() => import("./settings/ApiSettings"));
+const AuthSettings = lazy(() => import("./settings/AuthSettings"));
+const GeneralSettings = lazy(() => import("./settings/GeneralSettings"));
+const AdvancedSettings = lazy(() => import("./settings/AdvancedSettings"));
+
+const LoadingCard = () => (
+  <Card>
+    <CardContent className="p-6">
+      <div className="animate-pulse space-y-4">
+        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 const SettingsManager = () => {
   const navigate = useNavigate();
@@ -75,23 +89,33 @@ const SettingsManager = () => {
             </TabsList>
 
             <TabsContent value="account">
-              <AccountSettings />
+              <Suspense fallback={<LoadingCard />}>
+                <AccountSettings />
+              </Suspense>
             </TabsContent>
 
             <TabsContent value="api">
-              <ApiSettings />
+              <Suspense fallback={<LoadingCard />}>
+                <ApiSettings />
+              </Suspense>
             </TabsContent>
 
             <TabsContent value="auth">
-              <AuthSettings />
+              <Suspense fallback={<LoadingCard />}>
+                <AuthSettings />
+              </Suspense>
             </TabsContent>
 
             <TabsContent value="general">
-              <GeneralSettings />
+              <Suspense fallback={<LoadingCard />}>
+                <GeneralSettings />
+              </Suspense>
             </TabsContent>
 
             <TabsContent value="advanced">
-              <AdvancedSettings />
+              <Suspense fallback={<LoadingCard />}>
+                <AdvancedSettings />
+              </Suspense>
             </TabsContent>
           </Tabs>
         </SettingsErrorBoundary>

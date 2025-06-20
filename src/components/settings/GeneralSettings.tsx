@@ -36,11 +36,11 @@ const GeneralSettings = () => {
     }));
   };
 
-  const handleNestedSettingChange = (parent: string, key: string, value: any) => {
+  const handleNestedSettingChange = (parent: 'notifications' | 'backup' | 'logs', key: string, value: any) => {
     setSettings(prev => ({
       ...prev,
       [parent]: {
-        ...prev[parent as keyof typeof prev],
+        ...prev[parent],
         [key]: value
       }
     }));

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
+import SettingsErrorBoundary from "./settings/SettingsErrorBoundary";
 import AccountSettings from "./settings/AccountSettings";
 import ApiSettings from "./settings/ApiSettings";
 import AuthSettings from "./settings/AuthSettings";
@@ -48,50 +49,52 @@ const SettingsManager = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="account" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-fit">
-            <TabsTrigger value="account" className="flex items-center gap-2">
-              <User className="w-4 h-4" />
-              <span className="hidden sm:inline">Conta</span>
-            </TabsTrigger>
-            <TabsTrigger value="api" className="flex items-center gap-2">
-              <Key className="w-4 h-4" />
-              <span className="hidden sm:inline">API</span>
-            </TabsTrigger>
-            <TabsTrigger value="auth" className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              <span className="hidden sm:inline">Autenticação</span>
-            </TabsTrigger>
-            <TabsTrigger value="general" className="flex items-center gap-2">
-              <SettingsIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">Geral</span>
-            </TabsTrigger>
-            <TabsTrigger value="advanced" className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              <span className="hidden sm:inline">Avançado</span>
-            </TabsTrigger>
-          </TabsList>
+        <SettingsErrorBoundary>
+          <Tabs defaultValue="account" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-5 lg:w-fit">
+              <TabsTrigger value="account" className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                <span className="hidden sm:inline">Conta</span>
+              </TabsTrigger>
+              <TabsTrigger value="api" className="flex items-center gap-2">
+                <Key className="w-4 h-4" />
+                <span className="hidden sm:inline">API</span>
+              </TabsTrigger>
+              <TabsTrigger value="auth" className="flex items-center gap-2">
+                <Shield className="w-4 h-4" />
+                <span className="hidden sm:inline">Autenticação</span>
+              </TabsTrigger>
+              <TabsTrigger value="general" className="flex items-center gap-2">
+                <SettingsIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Geral</span>
+              </TabsTrigger>
+              <TabsTrigger value="advanced" className="flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                <span className="hidden sm:inline">Avançado</span>
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="account">
-            <AccountSettings />
-          </TabsContent>
+            <TabsContent value="account">
+              <AccountSettings />
+            </TabsContent>
 
-          <TabsContent value="api">
-            <ApiSettings />
-          </TabsContent>
+            <TabsContent value="api">
+              <ApiSettings />
+            </TabsContent>
 
-          <TabsContent value="auth">
-            <AuthSettings />
-          </TabsContent>
+            <TabsContent value="auth">
+              <AuthSettings />
+            </TabsContent>
 
-          <TabsContent value="general">
-            <GeneralSettings />
-          </TabsContent>
+            <TabsContent value="general">
+              <GeneralSettings />
+            </TabsContent>
 
-          <TabsContent value="advanced">
-            <AdvancedSettings />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="advanced">
+              <AdvancedSettings />
+            </TabsContent>
+          </Tabs>
+        </SettingsErrorBoundary>
       </main>
     </div>
   );

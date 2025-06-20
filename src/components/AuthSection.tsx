@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Youtube, Shield, Zap, Users } from "lucide-react";
+import { Youtube, Shield, Zap, Users, Blocks } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 

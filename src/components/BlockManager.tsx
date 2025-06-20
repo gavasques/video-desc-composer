@@ -105,7 +105,7 @@ const BlockManager = () => {
   };
 
   const handleDeleteBlock = (id: string) => {
-    const block = blocks.fin(b => b.id === id);
+    const block = blocks.find(b => b.id === id);
     setBlocks(blocks.filter(b => b.id !== id));
     
     toast({

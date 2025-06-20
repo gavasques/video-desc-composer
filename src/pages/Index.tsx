@@ -1,30 +1,18 @@
-
-import React, { Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Youtube, Settings, Video, Blocks, Tags, Calendar, Clock, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import AuthSection from "@/components/AuthSection";
-import { 
-  LazyDashboard, 
-  LazyBlockManager, 
-  LazyCategoryManager, 
-  LazyVideoManager, 
-  LazyPendingVideos, 
-  LazyApprovalQueue, 
-  LazyScheduleManager 
-} from "@/components/LazyComponents";
+import Dashboard from "@/components/Dashboard";
+import VideoManager from "@/components/VideoManager";
+import BlockManager from "@/components/BlockManager";
+import CategoryManager from "@/components/CategoryManager";
+import ApprovalQueue from "@/components/ApprovalQueue";
+import PendingVideos from "@/components/PendingVideos";
+import ScheduleManager from "@/components/ScheduleManager";
 import { useNavigate } from "react-router-dom";
 import { useSettings } from "@/contexts/SettingsContext";
-
-// Loading component for Suspense
-const TabLoading = () => (
-  <div className="flex items-center justify-center p-8">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-    <span className="ml-2 text-gray-600">Carregando...</span>
-  </div>
-);
 
 const Index = () => {
   const { isAuthenticated, setIsAuthenticated, userInfo, setUserInfo } = useSettings();
@@ -119,45 +107,31 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="dashboard">
-            <Suspense fallback={<TabLoading />}>
-              <LazyDashboard />
-            </Suspense>
+            <Dashboard />
           </TabsContent>
 
           <TabsContent value="blocks">
-            <Suspense fallback={<TabLoading />}>
-              <LazyBlockManager />
-            </Suspense>
+            <BlockManager />
           </TabsContent>
 
           <TabsContent value="categories">
-            <Suspense fallback={<TabLoading />}>
-              <LazyCategoryManager />
-            </Suspense>
+            <CategoryManager />
           </TabsContent>
 
           <TabsContent value="videos">
-            <Suspense fallback={<TabLoading />}>
-              <LazyVideoManager />
-            </Suspense>
+            <VideoManager />
           </TabsContent>
 
           <TabsContent value="pending">
-            <Suspense fallback={<TabLoading />}>
-              <LazyPendingVideos />
-            </Suspense>
+            <PendingVideos />
           </TabsContent>
 
           <TabsContent value="approval">
-            <Suspense fallback={<TabLoading />}>
-              <LazyApprovalQueue />
-            </Suspense>
+            <ApprovalQueue />
           </TabsContent>
 
           <TabsContent value="schedule">
-            <Suspense fallback={<TabLoading />}>
-              <LazyScheduleManager />
-            </Suspense>
+            <ScheduleManager />
           </TabsContent>
         </Tabs>
       </main>

@@ -14,13 +14,17 @@ export const useApiKeyManager = () => {
   });
 
   useEffect(() => {
-    const savedKey = StorageService.loadSettings('youtube-api-key', '');
-    if (savedKey) {
-      setConfig(prev => ({ ...prev, key: savedKey, status: 'valid' }));
-    }
+    const loadSavedKey = async () => {
+      const savedKey = await StorageService.loadSettings('youtube-api-key', '');
+      if (savedKey) {
+        setConfig(prev => ({ ...prev, key: savedKey, status: 'valid' }));
+      }
+    };
+    
+    loadSavedKey();
   }, []);
 
-  const saveApiKey = (key: string) => {
+  const saveApiKey = async (key: string) => {
     const validation = ValidationService.validateApiKey(key);
     if (!validation.isValid) {
       toast({
@@ -31,7 +35,7 @@ export const useApiKeyManager = () => {
       return;
     }
 
-    StorageService.saveSettings('youtube-api-key', key);
+    await StorageService.saveSettings('youtube-api-key', key);
     setConfig(prev => ({ ...prev, key }));
     toast({
       title: "Chave de API salva",

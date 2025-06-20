@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, Filter, Video, Eye, Edit, Calendar, Tag, ToggleLeft, ToggleRight, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,6 +50,65 @@ const VideoManager = () => {
     order: 1,
     schedule: { type: 'permanent' }
   });
+
+  // Mock video data
+  const [videos, setVideos] = useState<VideoData[]>([
+    {
+      id: '1',
+      title: 'Como criar automações no YouTube - Tutorial Completo',
+      thumbnail: '/placeholder.svg',
+      publishedAt: '2024-01-15',
+      views: '12.5K',
+      category: 'Tutoriais',
+      hasCustomBlocks: true,
+      blocksCount: 3,
+      status: 'published',
+      autoUpdate: true,
+      currentDescription: 'Neste vídeo você vai aprender como criar automações incríveis para o YouTube...\n\n📱 Instagram: @meucanal\n🐦 Twitter: @meucanal\n💼 LinkedIn: linkedin.com/in/meucanal\n\n👍 Se este vídeo foi útil, deixe seu like e se inscreva no canal!\n🔔 Ative o sininho para não perder nenhum conteúdo novo!\n\n#YouTube #Automação #Tutorial',
+      blocks: [
+        {
+          id: 'video-1-block-1',
+          title: 'Links dos Recursos Mencionados',
+          content: '🔗 Ferramenta A: https://exemplo.com/ferramenta-a\n🔗 Ferramenta B: https://exemplo.com/ferramenta-b\n📋 Template gratuito: https://exemplo.com/template',
+          type: 'specific',
+          videoId: '1',
+          isActive: true,
+          order: 2,
+          affectedVideos: 1,
+          lastModified: '2024-01-15',
+          schedule: { type: 'permanent' }
+        }
+      ]
+    },
+    {
+      id: '2',
+      title: 'Review: Melhor ferramenta de edição de vídeo 2024',
+      thumbnail: '/placeholder.svg',
+      publishedAt: '2024-01-10',
+      views: '8.2K',
+      category: 'Reviews',
+      hasCustomBlocks: false,
+      blocksCount: 2,
+      status: 'published',
+      autoUpdate: true,
+      currentDescription: 'Hoje vamos fazer uma review completa da melhor ferramenta de edição...\n\n📱 Instagram: @meucanal\n🐦 Twitter: @meucanal\n💼 LinkedIn: linkedin.com/in/meucanal\n\n🔍 Gostou da review? Deixe seu like e se inscreva!\n💬 Comente qual ferramenta quer ver revisada!\n\n#Review #Análise #Ferramentas',
+      blocks: []
+    },
+    {
+      id: '3',
+      title: 'Vlog: Um dia na vida de um criador de conteúdo',
+      thumbnail: '/placeholder.svg',
+      publishedAt: '2024-01-08',
+      views: '15.1K',
+      category: 'Vlogs',
+      hasCustomBlocks: false,
+      blocksCount: 1,
+      status: 'published',
+      autoUpdate: false,
+      currentDescription: 'Venha comigo neste vlog e veja como é um dia na vida de um criador...\n\n📱 Instagram: @meucanal\n🐦 Twitter: @meucanal\n💼 LinkedIn: linkedin.com/in/meucanal',
+      blocks: []
+    }
+  ]);
 
   // Mock general blocks (static and category blocks)
   const [generalBlocks] = useState<Block[]>([

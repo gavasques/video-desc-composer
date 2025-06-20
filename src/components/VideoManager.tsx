@@ -1,11 +1,12 @@
-
 import { useState } from "react";
-import { Search, Filter, Video, Eye, Edit, Calendar, Tag } from "lucide-react";
+import { Search, Filter, Video, Eye, Edit, Calendar, Tag, ToggleLeft, ToggleRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "@/hooks/use-toast";
 
 interface VideoData {
   id: string;
@@ -17,14 +18,16 @@ interface VideoData {
   hasCustomBlocks: boolean;
   blocksCount: number;
   status: 'published' | 'draft' | 'scheduled';
+  autoUpdate: boolean;
 }
 
 const VideoManager = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedUpdateStatus, setSelectedUpdateStatus] = useState('all');
 
-  const videos: VideoData[] = [
+  const [videos, setVideos] = useState<VideoData[]>([
     {
       id: '1',
       title: 'Como Criar um Sistema de Blocos Modulares - Tutorial Completo',
@@ -34,7 +37,8 @@ const VideoManager = () => {
       category: 'Tutoriais',
       hasCustomBlocks: true,
       blocksCount: 5,
-      status: 'published'
+      status: 'published',
+      autoUpdate: true
     },
     {
       id: '2',
@@ -45,7 +49,8 @@ const VideoManager = () => {
       category: 'Reviews',
       hasCustomBlocks: true,
       blocksCount: 4,
-      status: 'published'
+      status: 'published',
+      autoUpdate: true
     },
     {
       id: '3',
@@ -56,7 +61,8 @@ const VideoManager = () => {
       category: 'Vlogs',
       hasCustomBlocks: false,
       blocksCount: 2,
-      status: 'published'
+      status: 'published',
+      autoUpdate: false
     },
     {
       id: '4',
@@ -67,7 +73,8 @@ const VideoManager = () => {
       category: 'Gaming',
       hasCustomBlocks: true,
       blocksCount: 3,
-      status: 'published'
+      status: 'published',
+      autoUpdate: true
     },
     {
       id: '5',
@@ -78,17 +85,35 @@ const VideoManager = () => {
       category: 'Tutoriais',
       hasCustomBlocks: false,
       blocksCount: 0,
-      status: 'scheduled'
+      status: 'scheduled',
+      autoUpdate: true
     }
-  ];
+  ]);
 
   const categories = ['Tutoriais', 'Reviews', 'Vlogs', 'Gaming'];
+
+  const handleToggleAutoUpdate = (videoId: string) => {
+    setVideos(videos.map(video => {
+      if (video.id === videoId) {
+        const newAutoUpdate = !video.autoUpdate;
+        toast({
+          title: newAutoUpdate ? "Atualização automática ativada" : "Atualização automática desativada",
+          description: `O vídeo "${video.title}" ${newAutoUpdate ? 'receberá' : 'não receberá'} atualizações automáticas de blocos.`,
+        });
+        return { ...video, autoUpdate: newAutoUpdate };
+      }
+      return video;
+    }));
+  };
 
   const filteredVideos = videos.filter(video => {
     const matchesSearch = video.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || video.category === selectedCategory;
     const matchesStatus = selectedStatus === 'all' || video.status === selectedStatus;
-    return matchesSearch && matchesCategory && matchesStatus;
+    const matchesUpdateStatus = selectedUpdateStatus === 'all' || 
+      (selectedUpdateStatus === 'auto' && video.autoUpdate) ||
+      (selectedUpdateStatus === 'manual' && !video.autoUpdate);
+    return matchesSearch && matchesCategory && matchesStatus && matchesUpdateStatus;
   });
 
   const getStatusColor = (status: string) => {
@@ -126,13 +151,16 @@ const VideoManager = () => {
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Vídeos</h2>
           <p className="text-gray-600">
-            Gerencie descrições e blocos de vídeos individuais
+            Gerencie descrições e controle atualizações automáticas
           </p>
         </div>
         
         <div className="flex items-center space-x-2">
           <Badge variant="outline" className="text-sm">
             {filteredVideos.length} vídeos
+          </Badge>
+          <Badge variant="outline" className="text-sm text-green-600">
+            {videos.filter(v => v.autoUpdate).length} com auto-update
           </Badge>
         </div>
       </div>
@@ -146,7 +174,7 @@ const VideoManager = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -178,6 +206,17 @@ const VideoManager = () => {
                 <SelectItem value="published">Publicados</SelectItem>
                 <SelectItem value="draft">Rascunhos</SelectItem>
                 <SelectItem value="scheduled">Agendados</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedUpdateStatus} onValueChange={setSelectedUpdateStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Atualização" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="auto">Automática</SelectItem>
+                <SelectItem value="manual">Manual</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -231,6 +270,33 @@ const VideoManager = () => {
                             {video.blocksCount} blocos personalizados
                           </Badge>
                         )}
+                        <Badge 
+                          variant="outline" 
+                          className={video.autoUpdate ? "text-green-600 border-green-200" : "text-orange-600 border-orange-200"}
+                        >
+                          {video.autoUpdate ? (
+                            <>
+                              <ToggleRight className="w-3 h-3 mr-1" />
+                              Auto-update
+                            </>
+                          ) : (
+                            <>
+                              <ToggleLeft className="w-3 h-3 mr-1" />
+                              Manual
+                            </>
+                          )}
+                        </Badge>
+                      </div>
+
+                      {/* Auto Update Control */}
+                      <div className="flex items-center space-x-2 mt-2">
+                        <Switch
+                          checked={video.autoUpdate}
+                          onCheckedChange={() => handleToggleAutoUpdate(video.id)}
+                        />
+                        <span className="text-sm text-gray-600">
+                          {video.autoUpdate ? 'Recebe atualizações automáticas' : 'Atualizações manuais apenas'}
+                        </span>
                       </div>
                     </div>
                     

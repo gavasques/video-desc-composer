@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Youtube, Settings, Video, Blocks, Tags, Calendar } from "lucide-react";
+import { Youtube, Settings, Video, Blocks, Tags, Calendar, Clock, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +11,8 @@ import Dashboard from "@/components/Dashboard";
 import VideoManager from "@/components/VideoManager";
 import BlockManager from "@/components/BlockManager";
 import CategoryManager from "@/components/CategoryManager";
+import ApprovalQueue from "@/components/ApprovalQueue";
+import PendingVideos from "@/components/PendingVideos";
 
 const Index = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -73,7 +75,7 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-fit">
+          <TabsList className="grid w-full grid-cols-7 lg:w-fit">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <Video className="w-4 h-4" />
               <span className="hidden sm:inline">Dashboard</span>
@@ -89,6 +91,14 @@ const Index = () => {
             <TabsTrigger value="videos" className="flex items-center gap-2">
               <Video className="w-4 h-4" />
               <span className="hidden sm:inline">Vídeos</span>
+            </TabsTrigger>
+            <TabsTrigger value="pending" className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              <span className="hidden sm:inline">Pendentes</span>
+            </TabsTrigger>
+            <TabsTrigger value="approval" className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Aprovação</span>
             </TabsTrigger>
             <TabsTrigger value="schedule" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -110,6 +120,14 @@ const Index = () => {
 
           <TabsContent value="videos">
             <VideoManager />
+          </TabsContent>
+
+          <TabsContent value="pending">
+            <PendingVideos />
+          </TabsContent>
+
+          <TabsContent value="approval">
+            <ApprovalQueue />
           </TabsContent>
 
           <TabsContent value="schedule">

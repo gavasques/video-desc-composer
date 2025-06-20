@@ -13,6 +13,7 @@ import BlockManager from "@/components/BlockManager";
 import CategoryManager from "@/components/CategoryManager";
 import ApprovalQueue from "@/components/ApprovalQueue";
 import PendingVideos from "@/components/PendingVideos";
+import ScheduleManager from "@/components/ScheduleManager";
 
 const Index = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -131,28 +132,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="schedule">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  Agendamento de Blocos
-                </CardTitle>
-                <CardDescription>
-                  Configure quando seus blocos devem ser ativados ou desativados
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Funcionalidade em Desenvolvimento
-                  </h3>
-                  <p className="text-gray-500">
-                    O sistema de agendamento será implementado na próxima versão
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <ScheduleManager />
           </TabsContent>
         </Tabs>
       </main>

@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Search, Filter, Video, Eye, Edit, Calendar, Tag, ToggleLeft, ToggleRight } from "lucide-react";
+import { Search, Filter, Video, Eye, Edit, Calendar, Tag, ToggleLeft, ToggleRight, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 
 interface VideoData {
@@ -19,6 +20,7 @@ interface VideoData {
   blocksCount: number;
   status: 'published' | 'draft' | 'scheduled';
   autoUpdate: boolean;
+  currentDescription: string;
 }
 
 const VideoManager = () => {
@@ -26,6 +28,7 @@ const VideoManager = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedUpdateStatus, setSelectedUpdateStatus] = useState('all');
+  const [viewingDescription, setViewingDescription] = useState<VideoData | null>(null);
 
   const [videos, setVideos] = useState<VideoData[]>([
     {
@@ -38,7 +41,24 @@ const VideoManager = () => {
       hasCustomBlocks: true,
       blocksCount: 5,
       status: 'published',
-      autoUpdate: true
+      autoUpdate: true,
+      currentDescription: `Neste tutorial completo, você vai aprender como criar um sistema de blocos modulares para otimizar suas descrições no YouTube.
+
+🎯 O que você vai aprender:
+- Configuração inicial do sistema
+- Criação de blocos reutilizáveis
+- Automação de descrições
+- Melhores práticas
+
+📱 REDES SOCIAIS:
+Instagram: @meucanal
+Twitter: @meucanal
+LinkedIn: linkedin.com/in/meucanal
+
+👍 Se este vídeo foi útil, deixe seu like e se inscreva no canal!
+🔔 Ative o sininho para não perder nenhum conteúdo novo!
+
+#YouTube #Automação #Tutorial`
     },
     {
       id: '2',
@@ -223,6 +243,60 @@ const VideoManager = () => {
         </CardContent>
       </Card>
 
+      {/* Description Preview Dialog */}
+      <Dialog open={!!viewingDescription} onOpenChange={() => setViewingDescription(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Descrição Atual</DialogTitle>
+            <DialogDescription>
+              {viewingDescription?.title}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <img
+                src={viewingDescription?.thumbnail}
+                alt={viewingDescription?.title}
+                className="w-32 h-20 object-cover rounded-lg"
+              />
+              <div>
+                <h4 className="font-semibold">{viewingDescription?.title}</h4>
+                <div className="flex items-center space-x-2 mt-1">
+                  <Badge variant="outline">{viewingDescription?.category}</Badge>
+                  <Badge variant="outline">{viewingDescription?.views} views</Badge>
+                  <Badge variant="outline">{viewingDescription?.publishedAt}</Badge>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-2">Descrição Completa:</h4>
+              <div className="bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
+                <pre className="text-sm whitespace-pre-wrap font-mono">
+                  {viewingDescription?.currentDescription}
+                </pre>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between pt-4 border-t">
+              <div className="text-sm text-gray-500">
+                Blocos aplicados: {viewingDescription?.blocksCount}
+              </div>
+              <div className="flex space-x-2">
+                <Button variant="outline">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Editar Blocos
+                </Button>
+                <Button>
+                  Atualizar Descrição
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Videos Grid */}
       <div className="grid grid-cols-1 gap-4">
         {filteredVideos.map((video) => (
@@ -302,6 +376,14 @@ const VideoManager = () => {
                     
                     {/* Actions */}
                     <div className="flex items-center space-x-2 ml-4">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setViewingDescription(video)}
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Descrição Atual
+                      </Button>
                       <Button variant="outline" size="sm">
                         <Eye className="w-4 h-4 mr-2" />
                         Preview

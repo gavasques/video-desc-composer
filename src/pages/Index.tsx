@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Youtube, Settings, Video, Blocks, Tags, Calendar, Clock, CheckCircle } from "lucide-react";
@@ -14,10 +13,12 @@ import CategoryManager from "@/components/CategoryManager";
 import ApprovalQueue from "@/components/ApprovalQueue";
 import PendingVideos from "@/components/PendingVideos";
 import ScheduleManager from "@/components/ScheduleManager";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const navigate = useNavigate();
 
   // Mock authentication status check
   const { data: authStatus } = useQuery({
@@ -64,7 +65,7 @@ const Index = () => {
                   Conectado
                 </span>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => navigate('/settings')}>
                 <Settings className="w-4 h-4 mr-2" />
                 Configurações
               </Button>

@@ -43,225 +43,93 @@ const VideoManager = () => {
   const [formData, setFormData] = useState<BlockFormData>({
     title: '',
     content: '',
-    type: 'static',
+    type: 'specific',
     category: '',
     videoId: '',
     order: 1,
     schedule: { type: 'permanent' }
   });
 
-  const [videos, setVideos] = useState<VideoData[]>([
+  // Mock general blocks (static and category blocks)
+  const [generalBlocks] = useState<Block[]>([
     {
-      id: '1',
-      title: 'Como Criar um Sistema de Blocos Modulares - Tutorial Completo',
-      thumbnail: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300&h=200&fit=crop',
-      publishedAt: '2024-01-15',
-      views: '15.2K',
-      category: 'Tutoriais',
-      hasCustomBlocks: true,
-      blocksCount: 5,
-      status: 'published',
-      autoUpdate: true,
-      currentDescription: `Neste tutorial completo, você vai aprender como criar um sistema de blocos modulares para otimizar suas descrições no YouTube.
-
-🎯 O que você vai aprender:
-- Configuração inicial do sistema
-- Criação de blocos reutilizáveis
-- Automação de descrições
-- Melhores práticas
-
-📱 REDES SOCIAIS:
-Instagram: @meucanal
-Twitter: @meucanal
-LinkedIn: linkedin.com/in/meucanal
-
-👍 Se este vídeo foi útil, deixe seu like e se inscreva no canal!
-🔔 Ative o sininho para não perder nenhum conteúdo novo!
-
-#YouTube #Automação #Tutorial`,
-      blocks: [
-        {
-          id: '1',
-          title: 'Links das Redes Sociais',
-          content: '📱 Instagram: @meucanal\n🐦 Twitter: @meucanal\n💼 LinkedIn: linkedin.com/in/meucanal',
-          type: 'static',
-          isActive: true,
-          order: 1,
-          affectedVideos: 127,
-          lastModified: '2024-01-15',
-          schedule: { type: 'permanent' }
-        },
-        {
-          id: '2',
-          title: 'Call to Action - Tutoriais',
-          content: '👍 Se este vídeo foi útil, deixe seu like e se inscreva no canal!\n🔔 Ative o sininho para não perder nenhum conteúdo novo!\n\n#YouTube #Automação #Tutorial',
-          type: 'category',
-          category: 'Tutoriais',
-          isActive: true,
-          order: 2,
-          affectedVideos: 34,
-          lastModified: '2024-01-15',
-          schedule: { type: 'permanent' }
-        }
-      ]
+      id: 'general-1',
+      title: 'Links das Redes Sociais',
+      content: '📱 Instagram: @meucanal\n🐦 Twitter: @meucanal\n💼 LinkedIn: linkedin.com/in/meucanal',
+      type: 'static',
+      isActive: true,
+      order: 1,
+      affectedVideos: 127,
+      lastModified: '2024-01-15',
+      schedule: { type: 'permanent' }
     },
     {
-      id: '2',
-      title: 'Review: Melhor Ferramenta para Criadores de Conteúdo 2024',
-      thumbnail: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=200&fit=crop',
-      publishedAt: '2024-01-12',
-      views: '8.7K',
+      id: 'general-2',
+      title: 'Call to Action - Tutoriais',
+      content: '👍 Se este vídeo foi útil, deixe seu like e se inscreva no canal!\n🔔 Ative o sininho para não perder nenhum conteúdo novo!\n\n#YouTube #Automação #Tutorial',
+      type: 'category',
+      category: 'Tutoriais',
+      isActive: true,
+      order: 2,
+      affectedVideos: 34,
+      lastModified: '2024-01-15',
+      schedule: { type: 'permanent' }
+    },
+    {
+      id: 'general-3',
+      title: 'Call to Action - Reviews',
+      content: '🔍 Gostou da review? Deixe seu like e se inscreva!\n💬 Comente qual ferramenta quer ver revisada!\n\n#Review #Análise #Ferramentas',
+      type: 'category',
       category: 'Reviews',
-      hasCustomBlocks: true,
-      blocksCount: 4,
-      status: 'published',
-      autoUpdate: true,
-      currentDescription: `Análise completa da ferramenta mais promissora para criadores de conteúdo em 2024.
-
-🔍 PONTOS ANALISADOS:
-- Interface e usabilidade
-- Recursos principais
-- Preço x benefício
-- Comparação com concorrentes
-
-📱 REDES SOCIAIS:
-Instagram: @meucanal
-Twitter: @meucanal
-LinkedIn: linkedin.com/in/meucanal
-
-👍 Deixe seu like se o vídeo foi útil!
-🔔 Ative o sininho para não perder nenhum vídeo
-
-#Review #Ferramentas #Criadores`,
-      blocks: [
-        {
-          id: '3',
-          title: 'Análise de Reviews',
-          content: '🔍 PONTOS ANALISADOS:\n- Interface e usabilidade\n- Recursos principais\n- Preço x benefício\n- Comparação com concorrentes',
-          type: 'category',
-          category: 'Reviews',
-          isActive: true,
-          order: 1,
-          affectedVideos: 15,
-          lastModified: '2024-01-15',
-          schedule: { type: 'permanent' }
-        }
-      ]
-    },
-    {
-      id: '3',
-      title: 'Meu Dia Criando Conteúdo - Vlog Behind the Scenes',
-      thumbnail: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=300&h=200&fit=crop',
-      publishedAt: '2024-01-10',
-      views: '12.4K',
-      category: 'Vlogs',
-      hasCustomBlocks: false,
-      blocksCount: 2,
-      status: 'published',
-      autoUpdate: false,
-      currentDescription: `Venha comigo ver como é meu dia criando conteúdo para o YouTube! Nos bastidores da criação.
-
-📸 O QUE VOCÊ VAI VER:
-- Rotina de gravação
-- Processo de edição
-- Planejamento de conteúdo
-- Dicas de produtividade
-
-📱 REDES SOCIAIS:
-Instagram: @meucanal
-Twitter: @meucanal
-
-#Vlog #Bastidores #YouTube`,
-      blocks: []
-    },
-    {
-      id: '4',
-      title: 'Gameplay Épico: Zerando o Jogo em Modo Difícil',
-      thumbnail: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300&h=200&fit=crop',
-      publishedAt: '2024-01-08',
-      views: '22.1K',
-      category: 'Gaming',
-      hasCustomBlocks: true,
-      blocksCount: 3,
-      status: 'published',
-      autoUpdate: true,
-      currentDescription: `Gameplay completo zerando o jogo no modo mais difícil! Uma verdadeira batalha épica.
-
-🎮 DESTAQUES DO GAMEPLAY:
-- Boss fights épicas
-- Estratégias avançadas
-- Momentos de tensão
-- Final emocionante
-
-📱 REDES SOCIAIS:
-Instagram: @meucanal
-Twitter: @meucanal
-LinkedIn: linkedin.com/in/meucanal
-
-👍 Deixe seu like se curtiu o gameplay!
-🔔 Ative o sininho para mais gameplays
-
-#Gaming #Gameplay #Desafio`,
-      blocks: [
-        {
-          id: '4',
-          title: 'Gaming CTA',
-          content: '🎮 DESTAQUES DO GAMEPLAY:\n- Boss fights épicas\n- Estratégias avançadas\n- Momentos de tensão\n- Final emocionante',
-          type: 'category',
-          category: 'Gaming',
-          isActive: true,
-          order: 1,
-          affectedVideos: 25,
-          lastModified: '2024-01-15',
-          schedule: { type: 'permanent' }
-        }
-      ]
-    },
-    {
-      id: '5',
-      title: 'Próximo Tutorial: Automação Avançada (Preview)',
-      thumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&h=200&fit=crop',
-      publishedAt: '2024-01-20',
-      views: '0',
-      category: 'Tutoriais',
-      hasCustomBlocks: false,
-      blocksCount: 0,
-      status: 'scheduled',
-      autoUpdate: true,
-      currentDescription: `Preview do próximo tutorial sobre automação avançada. Em breve no canal!
-
-🚀 O QUE VEM POR AÍ:
-- Automação completa
-- Integração com APIs
-- Fluxos avançados
-- Casos práticos
-
-📱 REDES SOCIAIS:
-Instagram: @meucanal
-Twitter: @meucanal
-LinkedIn: linkedin.com/in/meucanal
-
-🔔 Ative o sininho para ser notificado quando sair!
-
-#Tutorial #Automação #Preview`,
-      blocks: []
+      isActive: true,
+      order: 1,
+      affectedVideos: 15,
+      lastModified: '2024-01-15',
+      schedule: { type: 'permanent' }
     }
   ]);
 
   const categories = ['Tutoriais', 'Reviews', 'Vlogs', 'Gaming'];
 
+  // Get applied general blocks for a specific video
+  const getAppliedGeneralBlocks = (video: VideoData) => {
+    return generalBlocks.filter(block => {
+      if (!block.isActive) return false;
+      
+      if (block.type === 'static') return true;
+      if (block.type === 'category' && block.category === video.category) return true;
+      
+      return false;
+    });
+  };
+
+  // Get only specific blocks for a video
+  const getSpecificBlocks = (video: VideoData) => {
+    return video.blocks?.filter(block => block.type === 'specific') || [];
+  };
+
   const handleEditVideoBlocks = (video: VideoData) => {
     setEditingBlocksVideo(video);
+    setFormData({
+      title: '',
+      content: '',
+      type: 'specific',
+      category: '',
+      videoId: video.id,
+      order: 1,
+      schedule: { type: 'permanent' }
+    });
     setIsEditBlockDialogOpen(true);
   };
 
   const handlePreviewVideoBlocks = (video: VideoData) => {
-    if (video.blocks && video.blocks.length > 0) {
-      setPreviewBlock(video.blocks[0]); // Show first block as preview
+    const specificBlocks = getSpecificBlocks(video);
+    if (specificBlocks.length > 0) {
+      setPreviewBlock(specificBlocks[0]);
     } else {
       toast({
-        title: "Nenhum bloco encontrado",
-        description: "Este vídeo não possui blocos personalizados.",
+        title: "Nenhum bloco específico encontrado",
+        description: "Este vídeo não possui blocos específicos personalizados.",
       });
     }
   };
@@ -273,24 +141,22 @@ LinkedIn: linkedin.com/in/meucanal
       id: Date.now().toString(),
       title: formData.title,
       content: formData.content,
-      type: formData.type,
-      category: formData.type === 'category' ? formData.category : undefined,
-      videoId: formData.type === 'specific' ? formData.videoId : undefined,
+      type: 'specific',
+      videoId: editingBlocksVideo.id,
       isActive: true,
       order: formData.order,
-      affectedVideos: formData.type === 'static' ? 127 : formData.type === 'category' ? 34 : 1,
+      affectedVideos: 1,
       lastModified: new Date().toISOString().split('T')[0],
       schedule: formData.schedule
     };
 
-    // Update the video with the new block
+    // Update the video with the new specific block
     setVideos(videos.map(video => {
       if (video.id === editingBlocksVideo.id) {
         const updatedBlocks = [...(video.blocks || []), newBlock];
         return {
           ...video,
           blocks: updatedBlocks,
-          blocksCount: updatedBlocks.length,
           hasCustomBlocks: true
         };
       }
@@ -298,10 +164,9 @@ LinkedIn: linkedin.com/in/meucanal
     }));
 
     resetForm();
-    setIsEditBlockDialogOpen(false);
     
     toast({
-      title: "Bloco criado com sucesso!",
+      title: "Bloco específico criado com sucesso!",
       description: `O bloco "${newBlock.title}" foi adicionado ao vídeo "${editingBlocksVideo.title}".`,
     });
   };
@@ -311,8 +176,8 @@ LinkedIn: linkedin.com/in/meucanal
     setFormData({
       title: block.title,
       content: block.content,
-      type: block.type,
-      category: block.category || '',
+      type: 'specific',
+      category: '',
       videoId: block.videoId || '',
       order: block.order,
       schedule: block.schedule || { type: 'permanent' }
@@ -331,7 +196,7 @@ LinkedIn: linkedin.com/in/meucanal
       lastModified: new Date().toISOString().split('T')[0]
     };
 
-    // Update the video's blocks
+    // Update the video's specific blocks
     setVideos(videos.map(video => {
       if (video.id === editingBlocksVideo.id) {
         const updatedBlocks = (video.blocks || []).map(block => 
@@ -345,36 +210,43 @@ LinkedIn: linkedin.com/in/meucanal
       return video;
     }));
 
-    setUpdateRelatedDialog(updatedBlock);
     resetForm();
     setEditingBlock(null);
+    
+    toast({
+      title: "Bloco específico atualizado!",
+      description: `O bloco "${updatedBlock.title}" foi atualizado.`,
+    });
   };
 
-  const handleUpdateRelatedVideos = (shouldUpdate: boolean) => {
-    if (!updateRelatedDialog) return;
+  const handleDeleteSpecificBlock = (blockId: string) => {
+    if (!editingBlocksVideo) return;
 
-    if (shouldUpdate) {
-      toast({
-        title: "Atualizações programadas!",
-        description: `O bloco "${updateRelatedDialog.title}" foi atualizado.`,
-      });
-    } else {
-      toast({
-        title: "Edição salva",
-        description: "As alterações foram salvas sem afetar outros vídeos.",
-      });
-    }
-    
-    setUpdateRelatedDialog(null);
+    setVideos(videos.map(video => {
+      if (video.id === editingBlocksVideo.id) {
+        const updatedBlocks = (video.blocks || []).filter(block => block.id !== blockId);
+        return {
+          ...video,
+          blocks: updatedBlocks,
+          hasCustomBlocks: updatedBlocks.length > 0
+        };
+      }
+      return video;
+    }));
+
+    toast({
+      title: "Bloco removido",
+      description: "O bloco específico foi removido do vídeo.",
+    });
   };
 
   const resetForm = () => {
     setFormData({
       title: '',
       content: '',
-      type: 'static',
+      type: 'specific',
       category: '',
-      videoId: '',
+      videoId: editingBlocksVideo?.id || '',
       order: 1,
       schedule: { type: 'permanent' }
     });
@@ -513,27 +385,74 @@ LinkedIn: linkedin.com/in/meucanal
 
       {/* Edit Blocks Dialog */}
       <Dialog open={isEditBlockDialogOpen} onOpenChange={setIsEditBlockDialogOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Blocos - {editingBlocksVideo?.title}</DialogTitle>
             <DialogDescription>
-              Gerencie os blocos de conteúdo para este vídeo
+              Gerencie os blocos específicos para este vídeo
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-6">
-            {/* Existing Blocks */}
-            {editingBlocksVideo?.blocks && editingBlocksVideo.blocks.length > 0 && (
+            {/* Applied General Blocks */}
+            {editingBlocksVideo && (
               <div>
-                <h4 className="font-semibold mb-3">Blocos Existentes</h4>
+                <h4 className="font-semibold mb-3 text-blue-600">Blocos Aplicados Automaticamente</h4>
+                <p className="text-sm text-gray-600 mb-3">
+                  Estes blocos são aplicados automaticamente baseado na categoria e configurações gerais:
+                </p>
                 <div className="space-y-2">
-                  {editingBlocksVideo.blocks.map((block) => (
-                    <div key={block.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <h5 className="font-medium">{block.title}</h5>
-                        <p className="text-sm text-gray-600 line-clamp-1">{block.content}</p>
+                  {getAppliedGeneralBlocks(editingBlocksVideo).map((block) => (
+                    <div key={block.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <h5 className="font-medium">{block.title}</h5>
+                          <Badge variant="outline" className="text-xs">
+                            {block.type === 'static' ? 'Estático' : `Categoria: ${block.category}`}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Ordem {block.order}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 line-clamp-2 mt-1">{block.content}</p>
                       </div>
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-2 ml-4">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setPreviewBlock(block)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  {getAppliedGeneralBlocks(editingBlocksVideo).length === 0 && (
+                    <p className="text-gray-500 text-sm italic">
+                      Nenhum bloco geral está sendo aplicado automaticamente a este vídeo.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Specific Video Blocks */}
+            {editingBlocksVideo && getSpecificBlocks(editingBlocksVideo).length > 0 && (
+              <div>
+                <h4 className="font-semibold mb-3">Blocos Específicos do Vídeo</h4>
+                <div className="space-y-2">
+                  {getSpecificBlocks(editingBlocksVideo).map((block) => (
+                    <div key={block.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <h5 className="font-medium">{block.title}</h5>
+                          <Badge variant="outline" className="text-xs">
+                            Ordem {block.order}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 line-clamp-2 mt-1">{block.content}</p>
+                      </div>
+                      <div className="flex space-x-2 ml-4">
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -548,6 +467,14 @@ LinkedIn: linkedin.com/in/meucanal
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteSpecificBlock(block.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          ×
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -555,10 +482,10 @@ LinkedIn: linkedin.com/in/meucanal
               </div>
             )}
             
-            {/* Add New Block Form */}
+            {/* Add New Specific Block Form */}
             <div className="border-t pt-4">
               <h4 className="font-semibold mb-3">
-                {editingBlock ? 'Editar Bloco' : 'Adicionar Novo Bloco'}
+                {editingBlock ? 'Editar Bloco Específico' : 'Adicionar Novo Bloco Específico'}
               </h4>
               
               <BlockForm
@@ -580,7 +507,7 @@ LinkedIn: linkedin.com/in/meucanal
       <UpdateRelatedDialog
         block={updateRelatedDialog}
         onOpenChange={() => setUpdateRelatedDialog(null)}
-        onUpdate={handleUpdateRelatedVideos}
+        onUpdate={() => setUpdateRelatedDialog(null)}
       />
 
       {/* Preview Dialog */}
@@ -627,7 +554,7 @@ LinkedIn: linkedin.com/in/meucanal
             
             <div className="flex items-center justify-between pt-4 border-t">
               <div className="text-sm text-gray-500">
-                Blocos aplicados: {viewingDescription?.blocksCount}
+                Blocos aplicados: {viewingDescription && (getAppliedGeneralBlocks(viewingDescription).length + getSpecificBlocks(viewingDescription).length)}
               </div>
               <div className="flex space-x-2">
                 <Button 
@@ -693,11 +620,14 @@ LinkedIn: linkedin.com/in/meucanal
                         <Badge className={getStatusColor(video.status)}>
                           {getStatusLabel(video.status)}
                         </Badge>
-                        {video.hasCustomBlocks && (
+                        {getSpecificBlocks(video).length > 0 && (
                           <Badge variant="outline" className="text-green-600 border-green-200">
-                            {video.blocksCount} blocos personalizados
+                            {getSpecificBlocks(video).length} blocos específicos
                           </Badge>
                         )}
+                        <Badge variant="outline" className="text-blue-600 border-blue-200">
+                          {getAppliedGeneralBlocks(video).length} blocos automáticos
+                        </Badge>
                         <Badge 
                           variant="outline" 
                           className={video.autoUpdate ? "text-green-600 border-green-200" : "text-orange-600 border-orange-200"}

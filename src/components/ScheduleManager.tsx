@@ -207,14 +207,14 @@ const ScheduleManager = () => {
                       <div className="flex-1">
                         <h4 className="font-medium text-sm">{event.blockTitle}</h4>
                         <div className="flex items-center space-x-2 mt-1">
-                          <Badge className={getActionColor(event.action)} size="sm">
+                          <Badge className={getActionColor(event.action)}>
                             {getActionIcon(event.action)}
                             <span className="ml-1 capitalize">{event.action === 'activate' ? 'Ativar' : 'Desativar'}</span>
                           </Badge>
-                          <Badge variant="outline" size="sm">
+                          <Badge variant="outline">
                             {event.blockType === 'static' ? 'Estático' : event.category}
                           </Badge>
-                          <Badge className={getStatusColor(event.status)} size="sm">
+                          <Badge className={getStatusColor(event.status)}>
                             {getStatusIcon(event.status)}
                             <span className="ml-1 capitalize">{event.status === 'pending' ? 'Pendente' : event.status === 'completed' ? 'Concluído' : 'Falha'}</span>
                           </Badge>

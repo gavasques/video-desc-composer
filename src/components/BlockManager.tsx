@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Plus, Blocks, Tag, Video, Edit, Trash2, Calendar, Clock, ToggleLeft, ToggleRight, Eye, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -105,7 +106,11 @@ const BlockManager = () => {
       order: formData.order,
       affectedVideos: formData.type === 'static' ? 127 : formData.type === 'category' ? 34 : 1,
       lastModified: new Date().toISOString().split('T')[0],
-      schedule: formData.schedule.type === 'specific' ? formData.schedule : { type: 'permanent' }
+      schedule: formData.schedule.type === 'specific' ? {
+        type: formData.schedule.type,
+        startDate: formData.schedule.startDate,
+        endDate: formData.schedule.endDate
+      } : { type: 'permanent' }
     };
 
     setBlocks([...blocks, newBlock]);
@@ -141,7 +146,11 @@ const BlockManager = () => {
       title: formData.title,
       content: formData.content,
       order: formData.order,
-      schedule: formData.schedule.type === 'specific' ? formData.schedule : { type: 'permanent' },
+      schedule: formData.schedule.type === 'specific' ? {
+        type: formData.schedule.type,
+        startDate: formData.schedule.startDate,
+        endDate: formData.schedule.endDate
+      } : { type: 'permanent' },
       lastModified: new Date().toISOString().split('T')[0]
     };
 
@@ -178,7 +187,7 @@ const BlockManager = () => {
       category: '',
       videoId: '',
       order: 1,
-      schedule: { type: 'permanent' }
+      schedule: { type: 'permanent', startDate: undefined, endDate: undefined }
     });
   };
 
@@ -328,7 +337,7 @@ const BlockManager = () => {
                         id="permanent"
                         name="schedule"
                         checked={formData.schedule.type === 'permanent'}
-                        onChange={() => setFormData({...formData, schedule: { type: 'permanent' }})}
+                        onChange={() => setFormData({...formData, schedule: { type: 'permanent', startDate: undefined, endDate: undefined }})}
                       />
                       <Label htmlFor="permanent">Permanente</Label>
                     </div>
@@ -339,7 +348,7 @@ const BlockManager = () => {
                         id="specific"
                         name="schedule"
                         checked={formData.schedule.type === 'specific'}
-                        onChange={() => setFormData({...formData, schedule: { type: 'specific' }})}
+                        onChange={() => setFormData({...formData, schedule: { type: 'specific', startDate: undefined, endDate: undefined }})}
                       />
                       <Label htmlFor="specific">Data Específica</Label>
                     </div>

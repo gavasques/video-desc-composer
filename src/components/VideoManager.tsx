@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, Filter, Video, Eye, Edit, Calendar, Tag, ToggleLeft, ToggleRight, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,7 +71,24 @@ LinkedIn: linkedin.com/in/meucanal
       hasCustomBlocks: true,
       blocksCount: 4,
       status: 'published',
-      autoUpdate: true
+      autoUpdate: true,
+      currentDescription: `Análise completa da ferramenta mais promissora para criadores de conteúdo em 2024.
+
+🔍 PONTOS ANALISADOS:
+- Interface e usabilidade
+- Recursos principais
+- Preço x benefício
+- Comparação com concorrentes
+
+📱 REDES SOCIAIS:
+Instagram: @meucanal
+Twitter: @meucanal
+LinkedIn: linkedin.com/in/meucanal
+
+👍 Deixe seu like se o vídeo foi útil!
+🔔 Ative o sininho para não perder nenhum vídeo
+
+#Review #Ferramentas #Criadores`
     },
     {
       id: '3',
@@ -82,7 +100,20 @@ LinkedIn: linkedin.com/in/meucanal
       hasCustomBlocks: false,
       blocksCount: 2,
       status: 'published',
-      autoUpdate: false
+      autoUpdate: false,
+      currentDescription: `Venha comigo ver como é meu dia criando conteúdo para o YouTube! Nos bastidores da criação.
+
+📸 O QUE VOCÊ VAI VER:
+- Rotina de gravação
+- Processo de edição
+- Planejamento de conteúdo
+- Dicas de produtividade
+
+📱 REDES SOCIAIS:
+Instagram: @meucanal
+Twitter: @meucanal
+
+#Vlog #Bastidores #YouTube`
     },
     {
       id: '4',
@@ -94,7 +125,24 @@ LinkedIn: linkedin.com/in/meucanal
       hasCustomBlocks: true,
       blocksCount: 3,
       status: 'published',
-      autoUpdate: true
+      autoUpdate: true,
+      currentDescription: `Gameplay completo zerando o jogo no modo mais difícil! Uma verdadeira batalha épica.
+
+🎮 DESTAQUES DO GAMEPLAY:
+- Boss fights épicas
+- Estratégias avançadas
+- Momentos de tensão
+- Final emocionante
+
+📱 REDES SOCIAIS:
+Instagram: @meucanal
+Twitter: @meucanal
+LinkedIn: linkedin.com/in/meucanal
+
+👍 Deixe seu like se curtiu o gameplay!
+🔔 Ative o sininho para mais gameplays
+
+#Gaming #Gameplay #Desafio`
     },
     {
       id: '5',
@@ -106,7 +154,23 @@ LinkedIn: linkedin.com/in/meucanal
       hasCustomBlocks: false,
       blocksCount: 0,
       status: 'scheduled',
-      autoUpdate: true
+      autoUpdate: true,
+      currentDescription: `Preview do próximo tutorial sobre automação avançada. Em breve no canal!
+
+🚀 O QUE VEM POR AÍ:
+- Automação completa
+- Integração com APIs
+- Fluxos avançados
+- Casos práticos
+
+📱 REDES SOCIAIS:
+Instagram: @meucanal
+Twitter: @meucanal
+LinkedIn: linkedin.com/in/meucanal
+
+🔔 Ative o sininho para ser notificado quando sair!
+
+#Tutorial #Automação #Preview`
     }
   ]);
 

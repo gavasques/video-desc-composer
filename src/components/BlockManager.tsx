@@ -147,13 +147,13 @@ const BlockManager = () => {
         onOpenChange={() => setPreviewBlock(null)}
       />
 
-      {/* Block List */}
+      {/* Block List - Fixed prop names to match BlockListProps interface */}
       <BlockList
         blocks={blocks}
-        onEditBlock={handleEditBlock}
-        onToggleBlock={toggleBlock}
-        onDeleteBlock={deleteBlock}
-        onPreviewBlock={setPreviewBlock}
+        onEdit={handleEditBlock}
+        onToggle={toggleBlock}
+        onDelete={deleteBlock}
+        onPreview={setPreviewBlock}
       />
     </div>
   );

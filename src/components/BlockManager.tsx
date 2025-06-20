@@ -1,13 +1,14 @@
-
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { BlockFormData } from "@/types/block";
 import BlockForm from "./blocks/BlockForm";
-import BlockList from "./blocks/BlockList";
+import OptimizedBlockList from "./blocks/OptimizedBlockList";
+import VirtualizedBlockList from "./blocks/VirtualizedBlockList";
 import BlockPreviewDialog from "./blocks/BlockPreviewDialog";
 import UpdateRelatedDialog from "./blocks/UpdateRelatedDialog";
+import PerformanceMonitor from "./common/PerformanceMonitor";
 import { useBlockManager } from "@/hooks/useBlockManager";
 import { toast } from "@/hooks/use-toast";
 
@@ -18,6 +19,7 @@ const BlockManager = () => {
   const [editingBlock, setEditingBlock] = useState<any>(null);
   const [previewBlock, setPreviewBlock] = useState<any>(null);
   const [updateRelatedDialog, setUpdateRelatedDialog] = useState<any>(null);
+  const [useVirtualization, setUseVirtualization] = useState(blocks.length > 50);
   
   const [formData, setFormData] = useState<BlockFormData>({
     title: '',
@@ -98,6 +100,8 @@ const BlockManager = () => {
 
   return (
     <div className="space-y-6">
+      <PerformanceMonitor componentName="BlockManager" />
+      
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -107,32 +111,42 @@ const BlockManager = () => {
           </p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-red-500 hover:bg-red-600" onClick={() => setEditingBlock(null)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Novo Bloco
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {editingBlock ? 'Editar Bloco' : 'Criar Novo Bloco'}
-              </DialogTitle>
-              <DialogDescription>
-                Configure um bloco de conteúdo para aplicar nas descrições dos vídeos
-              </DialogDescription>
-            </DialogHeader>
-            
-            <BlockForm
-              formData={formData}
-              setFormData={setFormData}
-              isEditing={!!editingBlock}
-              onSubmit={editingBlock ? handleUpdateBlock : handleCreateBlock}
-              onCancel={() => setIsDialogOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setUseVirtualization(!useVirtualization)}
+          >
+            {useVirtualization ? 'Lista Normal' : 'Virtualizado'}
+          </Button>
+          
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-red-500 hover:bg-red-600" onClick={() => setEditingBlock(null)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Novo Bloco
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingBlock ? 'Editar Bloco' : 'Criar Novo Bloco'}
+                </DialogTitle>
+                <DialogDescription>
+                  Configure um bloco de conteúdo para aplicar nas descrições dos vídeos
+                </DialogDescription>
+              </DialogHeader>
+              
+              <BlockForm
+                formData={formData}
+                setFormData={setFormData}
+                isEditing={!!editingBlock}
+                onSubmit={editingBlock ? handleUpdateBlock : handleCreateBlock}
+                onCancel={() => setIsDialogOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Dialogs */}
@@ -147,14 +161,25 @@ const BlockManager = () => {
         onOpenChange={() => setPreviewBlock(null)}
       />
 
-      {/* Block List - Fixed prop names to match BlockListProps interface */}
-      <BlockList
-        blocks={blocks}
-        onEdit={handleEditBlock}
-        onToggle={toggleBlock}
-        onDelete={deleteBlock}
-        onPreview={setPreviewBlock}
-      />
+      {/* Block List - Conditional Virtualization */}
+      {useVirtualization ? (
+        <VirtualizedBlockList
+          blocks={blocks}
+          onEdit={handleEditBlock}
+          onToggle={toggleBlock}
+          onDelete={deleteBlock}
+          onPreview={setPreviewBlock}
+          height={600}
+        />
+      ) : (
+        <OptimizedBlockList
+          blocks={blocks}
+          onEdit={handleEditBlock}
+          onToggle={toggleBlock}
+          onDelete={deleteBlock}
+          onPreview={setPreviewBlock}
+        />
+      )}
     </div>
   );
 };

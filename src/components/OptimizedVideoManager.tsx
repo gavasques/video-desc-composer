@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { Video, Eye, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -10,7 +10,10 @@ import UpdateRelatedDialog from "./blocks/UpdateRelatedDialog";
 import VideoFilters from "./videos/VideoFilters";
 import VideoCard from "./videos/VideoCard";
 import VideoDetailsDialog from "./videos/VideoDetailsDialog";
+import VirtualizedVideoList from "./videos/VirtualizedVideoList";
 import { useOptimizedVideoManager, VideoData } from "@/hooks/useOptimizedVideoManager";
+import { useDebounceSearch } from "@/hooks/useDebounceSearch";
+import { usePagination } from "@/hooks/usePagination";
 import { Button } from "@/components/ui/button";
 
 const OptimizedVideoManager = React.memo(() => {
@@ -35,7 +38,11 @@ const OptimizedVideoManager = React.memo(() => {
   const [updateRelatedDialog, setUpdateRelatedDialog] = useState<Block | null>(null);
   const [isEditBlockDialogOpen, setIsEditBlockDialogOpen] = useState(false);
   const [editingBlock, setEditingBlock] = useState<Block | null>(null);
+  const [useVirtualization, setUseVirtualization] = useState(false);
   
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerHeight, setContainerHeight] = useState(600);
+
   const [formData, setFormData] = useState<BlockFormData>({
     title: '',
     content: '',
@@ -46,23 +53,64 @@ const OptimizedVideoManager = React.memo(() => {
     schedule: { type: 'permanent' }
   });
 
-  // Memoized filtered videos to prevent unnecessary recalculations
+  // Debounced search for better performance
+  const searchFunction = useCallback((video: VideoData, term: string) => {
+    return video.title.toLowerCase().includes(term);
+  }, []);
+
+  const { filteredItems: searchFilteredVideos, isSearching } = useDebounceSearch(
+    videos,
+    searchTerm,
+    searchFunction,
+    300
+  );
+
+  // Apply other filters to search results
   const filteredVideos = useMemo(() => {
-    return videos.filter(video => {
-      const matchesSearch = video.title.toLowerCase().includes(searchTerm.toLowerCase());
+    return searchFilteredVideos.filter(video => {
       const matchesCategory = selectedCategory === 'all' || video.category === selectedCategory;
       const matchesStatus = selectedStatus === 'all' || video.status === selectedStatus;
       const matchesUpdateStatus = selectedUpdateStatus === 'all' || 
         (selectedUpdateStatus === 'auto' && video.autoUpdate) ||
         (selectedUpdateStatus === 'manual' && !video.autoUpdate);
-      return matchesSearch && matchesCategory && matchesStatus && matchesUpdateStatus;
+      return matchesCategory && matchesStatus && matchesUpdateStatus;
     });
-  }, [videos, searchTerm, selectedCategory, selectedStatus, selectedUpdateStatus]);
+  }, [searchFilteredVideos, selectedCategory, selectedStatus, selectedUpdateStatus]);
+
+  // Pagination for large datasets
+  const pagination = usePagination(filteredVideos, 50);
+
+  // Auto-enable virtualization for large datasets
+  useEffect(() => {
+    setUseVirtualization(filteredVideos.length > 100);
+  }, [filteredVideos.length]);
+
+  // Measure container height for virtualization
+  useEffect(() => {
+    if (containerRef.current && useVirtualization) {
+      const updateHeight = () => {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (rect) {
+          setContainerHeight(Math.min(600, window.innerHeight - rect.top - 100));
+        }
+      };
+      
+      updateHeight();
+      window.addEventListener('resize', updateHeight);
+      return () => window.removeEventListener('resize', updateHeight);
+    }
+  }, [useVirtualization]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    pagination.resetPage();
+  }, [searchTerm, selectedCategory, selectedStatus, selectedUpdateStatus]);
 
   // Memoized stats to prevent recalculation
   const stats = useMemo(() => ({
     totalVideos: filteredVideos.length,
-    autoUpdateVideos: videos.filter(v => v.autoUpdate).length
+    autoUpdateVideos: videos.filter(v => v.autoUpdate).length,
+    isFiltered: filteredVideos.length !== videos.length
   }), [filteredVideos.length, videos]);
 
   const handleEditVideoBlocks = useCallback((video: VideoData) => {
@@ -134,6 +182,8 @@ const OptimizedVideoManager = React.memo(() => {
     });
   }, [editingBlocksVideo?.id]);
 
+  const videosToDisplay = useVirtualization ? filteredVideos : pagination.currentItems;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -142,16 +192,23 @@ const OptimizedVideoManager = React.memo(() => {
           <h2 className="text-2xl font-bold text-gray-900">Vídeos</h2>
           <p className="text-gray-600">
             Gerencie descrições e controle atualizações automáticas
+            {isSearching && <span className="text-blue-500 ml-2">(Buscando...)</span>}
           </p>
         </div>
         
         <div className="flex items-center space-x-2">
           <Badge variant="outline" className="text-sm">
             {stats.totalVideos} vídeos
+            {stats.isFiltered && ` (de ${videos.length})`}
           </Badge>
           <Badge variant="outline" className="text-sm text-green-600">
             {stats.autoUpdateVideos} com auto-update
           </Badge>
+          {useVirtualization && (
+            <Badge variant="outline" className="text-sm text-blue-600">
+              Virtualizado
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -305,21 +362,66 @@ const OptimizedVideoManager = React.memo(() => {
         onEditBlocks={handleEditVideoBlocks}
       />
 
-      {/* Videos Grid */}
-      <div className="grid grid-cols-1 gap-4">
-        {filteredVideos.map((video) => (
-          <VideoCard
-            key={video.id}
-            video={video}
-            appliedGeneralBlocks={getAppliedGeneralBlocks(video)}
-            specificBlocks={getSpecificBlocks(video)}
+      {/* Videos List with Conditional Virtualization */}
+      <div ref={containerRef}>
+        {useVirtualization ? (
+          <VirtualizedVideoList
+            videos={videosToDisplay}
+            getAppliedGeneralBlocks={getAppliedGeneralBlocks}
+            getSpecificBlocks={getSpecificBlocks}
             onViewDescription={setViewingDescription}
             onPreviewBlocks={handlePreviewVideoBlocks}
             onEditBlocks={handleEditVideoBlocks}
             onToggleAutoUpdate={handleToggleAutoUpdate}
+            height={containerHeight}
           />
-        ))}
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
+            {videosToDisplay.map((video) => (
+              <VideoCard
+                key={video.id}
+                video={video}
+                appliedGeneralBlocks={getAppliedGeneralBlocks(video)}
+                specificBlocks={getSpecificBlocks(video)}
+                onViewDescription={setViewingDescription}
+                onPreviewBlocks={handlePreviewVideoBlocks}
+                onEditBlocks={handleEditVideoBlocks}
+                onToggleAutoUpdate={handleToggleAutoUpdate}
+              />
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* Pagination Controls (only show when not virtualizing) */}
+      {!useVirtualization && filteredVideos.length > 0 && (
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Mostrando {pagination.startIndex} a {pagination.endIndex} de {pagination.totalItems} vídeos
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={pagination.previousPage}
+              disabled={!pagination.hasPrevious}
+            >
+              Anterior
+            </Button>
+            <span className="text-sm">
+              Página {pagination.currentPage} de {pagination.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={pagination.nextPage}
+              disabled={!pagination.hasNext}
+            >
+              Próxima
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Empty State */}
       {filteredVideos.length === 0 && (

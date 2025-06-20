@@ -1,5 +1,3 @@
-
-import { useState } from "react";
 import { Monitor, Bell, Download, FileText, Moon, Sun, Globe } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,43 +5,28 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const GeneralSettings = () => {
-  const [settings, setSettings] = useState({
-    theme: 'system',
-    language: 'pt-BR',
-    notifications: {
-      success: true,
-      errors: true,
-      updates: false,
-      marketing: false
-    },
-    backup: {
-      enabled: true,
-      frequency: 'daily',
-      location: 'local'
-    },
-    logs: {
-      level: 'info',
-      retention: '30'
-    }
-  });
+  const { settings, updateSettings } = useSettings();
 
   const handleSettingChange = (key: string, value: any) => {
-    setSettings(prev => ({
-      ...prev,
+    const newSettings = {
+      ...settings,
       [key]: value
-    }));
+    };
+    updateSettings(newSettings);
   };
 
   const handleNestedSettingChange = (parent: 'notifications' | 'backup' | 'logs', key: string, value: any) => {
-    setSettings(prev => ({
-      ...prev,
+    const newSettings = {
+      ...settings,
       [parent]: {
-        ...prev[parent],
+        ...settings[parent],
         [key]: value
       }
-    }));
+    };
+    updateSettings(newSettings);
   };
 
   const handleSaveSettings = () => {
@@ -75,8 +58,7 @@ const GeneralSettings = () => {
       }
     };
     
-    setSettings(defaultSettings);
-    localStorage.setItem('app-settings', JSON.stringify(defaultSettings));
+    updateSettings(defaultSettings);
     
     toast({
       title: "Configurações resetadas",

@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Youtube, Settings, Video, Blocks, Tags, Calendar, Clock, CheckCircle } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
@@ -14,10 +12,10 @@ import ApprovalQueue from "@/components/ApprovalQueue";
 import PendingVideos from "@/components/PendingVideos";
 import ScheduleManager from "@/components/ScheduleManager";
 import { useNavigate } from "react-router-dom";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const Index = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
+  const { isAuthenticated, setIsAuthenticated, userInfo, setUserInfo } = useSettings();
   const navigate = useNavigate();
 
   // Mock authentication status check

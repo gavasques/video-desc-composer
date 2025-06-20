@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, Filter, Video, Eye, Edit, Calendar, Tag, ToggleLeft, ToggleRight, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
+import { Block, BlockFormData } from "@/types/block";
+import BlockForm from "./blocks/BlockForm";
+import BlockPreviewDialog from "./blocks/BlockPreviewDialog";
+import UpdateRelatedDialog from "./blocks/UpdateRelatedDialog";
 
 interface VideoData {
   id: string;
@@ -22,6 +25,7 @@ interface VideoData {
   status: 'published' | 'draft' | 'scheduled';
   autoUpdate: boolean;
   currentDescription: string;
+  blocks?: Block[];
 }
 
 const VideoManager = () => {
@@ -30,6 +34,21 @@ const VideoManager = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedUpdateStatus, setSelectedUpdateStatus] = useState('all');
   const [viewingDescription, setViewingDescription] = useState<VideoData | null>(null);
+  const [editingBlocksVideo, setEditingBlocksVideo] = useState<VideoData | null>(null);
+  const [previewBlock, setPreviewBlock] = useState<Block | null>(null);
+  const [updateRelatedDialog, setUpdateRelatedDialog] = useState<Block | null>(null);
+  const [isEditBlockDialogOpen, setIsEditBlockDialogOpen] = useState(false);
+  const [editingBlock, setEditingBlock] = useState<Block | null>(null);
+  
+  const [formData, setFormData] = useState<BlockFormData>({
+    title: '',
+    content: '',
+    type: 'static',
+    category: '',
+    videoId: '',
+    order: 1,
+    schedule: { type: 'permanent' }
+  });
 
   const [videos, setVideos] = useState<VideoData[]>([
     {
@@ -59,7 +78,32 @@ LinkedIn: linkedin.com/in/meucanal
 👍 Se este vídeo foi útil, deixe seu like e se inscreva no canal!
 🔔 Ative o sininho para não perder nenhum conteúdo novo!
 
-#YouTube #Automação #Tutorial`
+#YouTube #Automação #Tutorial`,
+      blocks: [
+        {
+          id: '1',
+          title: 'Links das Redes Sociais',
+          content: '📱 Instagram: @meucanal\n🐦 Twitter: @meucanal\n💼 LinkedIn: linkedin.com/in/meucanal',
+          type: 'static',
+          isActive: true,
+          order: 1,
+          affectedVideos: 127,
+          lastModified: '2024-01-15',
+          schedule: { type: 'permanent' }
+        },
+        {
+          id: '2',
+          title: 'Call to Action - Tutoriais',
+          content: '👍 Se este vídeo foi útil, deixe seu like e se inscreva no canal!\n🔔 Ative o sininho para não perder nenhum conteúdo novo!\n\n#YouTube #Automação #Tutorial',
+          type: 'category',
+          category: 'Tutoriais',
+          isActive: true,
+          order: 2,
+          affectedVideos: 34,
+          lastModified: '2024-01-15',
+          schedule: { type: 'permanent' }
+        }
+      ]
     },
     {
       id: '2',
@@ -88,7 +132,21 @@ LinkedIn: linkedin.com/in/meucanal
 👍 Deixe seu like se o vídeo foi útil!
 🔔 Ative o sininho para não perder nenhum vídeo
 
-#Review #Ferramentas #Criadores`
+#Review #Ferramentas #Criadores`,
+      blocks: [
+        {
+          id: '3',
+          title: 'Análise de Reviews',
+          content: '🔍 PONTOS ANALISADOS:\n- Interface e usabilidade\n- Recursos principais\n- Preço x benefício\n- Comparação com concorrentes',
+          type: 'category',
+          category: 'Reviews',
+          isActive: true,
+          order: 1,
+          affectedVideos: 15,
+          lastModified: '2024-01-15',
+          schedule: { type: 'permanent' }
+        }
+      ]
     },
     {
       id: '3',
@@ -113,7 +171,8 @@ LinkedIn: linkedin.com/in/meucanal
 Instagram: @meucanal
 Twitter: @meucanal
 
-#Vlog #Bastidores #YouTube`
+#Vlog #Bastidores #YouTube`,
+      blocks: []
     },
     {
       id: '4',
@@ -142,7 +201,21 @@ LinkedIn: linkedin.com/in/meucanal
 👍 Deixe seu like se curtiu o gameplay!
 🔔 Ative o sininho para mais gameplays
 
-#Gaming #Gameplay #Desafio`
+#Gaming #Gameplay #Desafio`,
+      blocks: [
+        {
+          id: '4',
+          title: 'Gaming CTA',
+          content: '🎮 DESTAQUES DO GAMEPLAY:\n- Boss fights épicas\n- Estratégias avançadas\n- Momentos de tensão\n- Final emocionante',
+          type: 'category',
+          category: 'Gaming',
+          isActive: true,
+          order: 1,
+          affectedVideos: 25,
+          lastModified: '2024-01-15',
+          schedule: { type: 'permanent' }
+        }
+      ]
     },
     {
       id: '5',
@@ -170,11 +243,142 @@ LinkedIn: linkedin.com/in/meucanal
 
 🔔 Ative o sininho para ser notificado quando sair!
 
-#Tutorial #Automação #Preview`
+#Tutorial #Automação #Preview`,
+      blocks: []
     }
   ]);
 
   const categories = ['Tutoriais', 'Reviews', 'Vlogs', 'Gaming'];
+
+  const handleEditVideoBlocks = (video: VideoData) => {
+    setEditingBlocksVideo(video);
+    setIsEditBlockDialogOpen(true);
+  };
+
+  const handlePreviewVideoBlocks = (video: VideoData) => {
+    if (video.blocks && video.blocks.length > 0) {
+      setPreviewBlock(video.blocks[0]); // Show first block as preview
+    } else {
+      toast({
+        title: "Nenhum bloco encontrado",
+        description: "Este vídeo não possui blocos personalizados.",
+      });
+    }
+  };
+
+  const handleCreateBlock = () => {
+    if (!editingBlocksVideo) return;
+
+    const newBlock: Block = {
+      id: Date.now().toString(),
+      title: formData.title,
+      content: formData.content,
+      type: formData.type,
+      category: formData.type === 'category' ? formData.category : undefined,
+      videoId: formData.type === 'specific' ? formData.videoId : undefined,
+      isActive: true,
+      order: formData.order,
+      affectedVideos: formData.type === 'static' ? 127 : formData.type === 'category' ? 34 : 1,
+      lastModified: new Date().toISOString().split('T')[0],
+      schedule: formData.schedule
+    };
+
+    // Update the video with the new block
+    setVideos(videos.map(video => {
+      if (video.id === editingBlocksVideo.id) {
+        const updatedBlocks = [...(video.blocks || []), newBlock];
+        return {
+          ...video,
+          blocks: updatedBlocks,
+          blocksCount: updatedBlocks.length,
+          hasCustomBlocks: true
+        };
+      }
+      return video;
+    }));
+
+    resetForm();
+    setIsEditBlockDialogOpen(false);
+    
+    toast({
+      title: "Bloco criado com sucesso!",
+      description: `O bloco "${newBlock.title}" foi adicionado ao vídeo "${editingBlocksVideo.title}".`,
+    });
+  };
+
+  const handleEditBlock = (block: Block) => {
+    setEditingBlock(block);
+    setFormData({
+      title: block.title,
+      content: block.content,
+      type: block.type,
+      category: block.category || '',
+      videoId: block.videoId || '',
+      order: block.order,
+      schedule: block.schedule || { type: 'permanent' }
+    });
+  };
+
+  const handleUpdateBlock = () => {
+    if (!editingBlock || !editingBlocksVideo) return;
+
+    const updatedBlock: Block = {
+      ...editingBlock,
+      title: formData.title,
+      content: formData.content,
+      order: formData.order,
+      schedule: formData.schedule,
+      lastModified: new Date().toISOString().split('T')[0]
+    };
+
+    // Update the video's blocks
+    setVideos(videos.map(video => {
+      if (video.id === editingBlocksVideo.id) {
+        const updatedBlocks = (video.blocks || []).map(block => 
+          block.id === editingBlock.id ? updatedBlock : block
+        );
+        return {
+          ...video,
+          blocks: updatedBlocks
+        };
+      }
+      return video;
+    }));
+
+    setUpdateRelatedDialog(updatedBlock);
+    resetForm();
+    setEditingBlock(null);
+  };
+
+  const handleUpdateRelatedVideos = (shouldUpdate: boolean) => {
+    if (!updateRelatedDialog) return;
+
+    if (shouldUpdate) {
+      toast({
+        title: "Atualizações programadas!",
+        description: `O bloco "${updateRelatedDialog.title}" foi atualizado.`,
+      });
+    } else {
+      toast({
+        title: "Edição salva",
+        description: "As alterações foram salvas sem afetar outros vídeos.",
+      });
+    }
+    
+    setUpdateRelatedDialog(null);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      content: '',
+      type: 'static',
+      category: '',
+      videoId: '',
+      order: 1,
+      schedule: { type: 'permanent' }
+    });
+  };
 
   const handleToggleAutoUpdate = (videoId: string) => {
     setVideos(videos.map(video => {
@@ -307,6 +511,84 @@ LinkedIn: linkedin.com/in/meucanal
         </CardContent>
       </Card>
 
+      {/* Edit Blocks Dialog */}
+      <Dialog open={isEditBlockDialogOpen} onOpenChange={setIsEditBlockDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Editar Blocos - {editingBlocksVideo?.title}</DialogTitle>
+            <DialogDescription>
+              Gerencie os blocos de conteúdo para este vídeo
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Existing Blocks */}
+            {editingBlocksVideo?.blocks && editingBlocksVideo.blocks.length > 0 && (
+              <div>
+                <h4 className="font-semibold mb-3">Blocos Existentes</h4>
+                <div className="space-y-2">
+                  {editingBlocksVideo.blocks.map((block) => (
+                    <div key={block.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <h5 className="font-medium">{block.title}</h5>
+                        <p className="text-sm text-gray-600 line-clamp-1">{block.content}</p>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setPreviewBlock(block)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditBlock(block)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Add New Block Form */}
+            <div className="border-t pt-4">
+              <h4 className="font-semibold mb-3">
+                {editingBlock ? 'Editar Bloco' : 'Adicionar Novo Bloco'}
+              </h4>
+              
+              <BlockForm
+                formData={formData}
+                setFormData={setFormData}
+                isEditing={!!editingBlock}
+                onSubmit={editingBlock ? handleUpdateBlock : handleCreateBlock}
+                onCancel={() => {
+                  resetForm();
+                  setEditingBlock(null);
+                }}
+              />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Update Related Dialog */}
+      <UpdateRelatedDialog
+        block={updateRelatedDialog}
+        onOpenChange={() => setUpdateRelatedDialog(null)}
+        onUpdate={handleUpdateRelatedVideos}
+      />
+
+      {/* Preview Dialog */}
+      <BlockPreviewDialog
+        block={previewBlock}
+        onOpenChange={() => setPreviewBlock(null)}
+      />
+
       {/* Description Preview Dialog */}
       <Dialog open={!!viewingDescription} onOpenChange={() => setViewingDescription(null)}>
         <DialogContent className="max-w-4xl">
@@ -348,7 +630,15 @@ LinkedIn: linkedin.com/in/meucanal
                 Blocos aplicados: {viewingDescription?.blocksCount}
               </div>
               <div className="flex space-x-2">
-                <Button variant="outline">
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    if (viewingDescription) {
+                      handleEditVideoBlocks(viewingDescription);
+                      setViewingDescription(null);
+                    }
+                  }}
+                >
                   <Edit className="w-4 h-4 mr-2" />
                   Editar Blocos
                 </Button>
@@ -448,11 +738,19 @@ LinkedIn: linkedin.com/in/meucanal
                         <FileText className="w-4 h-4 mr-2" />
                         Descrição Atual
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handlePreviewVideoBlocks(video)}
+                      >
                         <Eye className="w-4 h-4 mr-2" />
                         Preview
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleEditVideoBlocks(video)}
+                      >
                         <Edit className="w-4 h-4 mr-2" />
                         Editar Blocos
                       </Button>

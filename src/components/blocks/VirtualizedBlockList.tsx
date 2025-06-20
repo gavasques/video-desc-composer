@@ -1,3 +1,4 @@
+
 import React, { memo, useMemo } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import { Block } from '@/types/block';
@@ -145,9 +146,8 @@ const VirtualizedBlockList = memo<VirtualizedBlockListProps>(({
   return (
     <List
       height={height}
-      width="100%"
       itemCount={blocks.length}
-      itemSize={250}
+      itemSize={250} // Approximate height of BlockCard
       itemData={itemData}
     >
       {BlockItem}

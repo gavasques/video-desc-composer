@@ -81,9 +81,8 @@ const VirtualizedVideoList = memo<VirtualizedVideoListProps>(({
   return (
     <List
       height={height}
-      width="100%"
       itemCount={videos.length}
-      itemSize={200}
+      itemSize={200} // Approximate height of VideoCard
       itemData={itemData}
     >
       {VideoItem}
